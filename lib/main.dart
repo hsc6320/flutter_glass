@@ -1,5 +1,6 @@
 
 import 'dart:io';
+//import 'dart:js';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -36,108 +37,73 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int currentPageIndex =0;
-  List<Posting_Property?> PostingList = [];
+  late List<Posting_Property?> PostingList = [];
+  late ScrollController scrollController = ScrollController();
+
   
-  void cardClickEvent(/*BuildContext context,*/ int index) {
-    String content = itemContents[index];
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ContentPage(content: content),
-      ),
-    );
+   @override
+  void initState() {
+    scrollController = ScrollController();
+    super.initState();
   }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
+  }
+  
+  void ScrollToTop() {
+    var controller = PrimaryScrollController.of(context);
+    setState(() {
+      controller.animateTo(0,
+        duration: Duration(milliseconds: 500), curve: Curves.ease);
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
-    final sizex = MediaQuery.of(context).size.width;
-    final sizey = MediaQuery.of(context).size.height;
+    //final sizex = MediaQuery.of(context).size.width;
+    //final sizey = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar (
         title: Text("메인 페이지"),
       ),
-      body: PostingList.isEmpty
-        ? Center(child: Text("게시글이 없습니다."))
-          : Scrollbar(
-            child: Align(
-              alignment: Alignment.topCenter, 
-              child: SingleChildScrollView(
-                child: Container(
-                  margin: EdgeInsets.only(top: 5),
-                  color: Color.fromARGB(255, 189, 173, 51),
-                  child : Column (
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        margin: EdgeInsets.only(top: 5),
-                        //color: Color.fromARGB(255, 157, 219, 156),
-                        child: ListView.separated (//ListView.builder(\
-                          itemCount: PostingList.length,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index){
-                            return Container (
-                              onTap: () => cardClickEvent(/*context,*/ index),
-                              padding: EdgeInsets.all(5),
-                              color: Color.fromARGB(255, 219, 156, 175),
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    height: 150,
-                                    width: 90,
-                                    child: Image(image: FileImage(File(PostingList[index]!.UploadImages[0]!.path))),
-                                  ),
-                                  Expanded(
-                                    child: Container(
-                                      padding: EdgeInsets.all(5),
-                                      child: Column (
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                              child: Text(
-                                                PostingList[index]!.PostingTitle,
-                                                style: TextStyle(
-                                                  fontSize: 10,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                            Container(
-                                              child: Text(
-                                                PostingList[index]!.PostingMainText,
-                                                maxLines: 5,
-                                                style: TextStyle(
-                                                  fontSize: 10,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                    ))
-                                ],
-                              ),
-                            );
-                          }, separatorBuilder: (BuildContext context, int index) => const Divider(),
-                          
-                        ),
-                      ),
-                    ],
-                  )
-                ),
-              ),
-            )
+      body: IndexedStack (
+          index: currentPageIndex,
+          children: [
+            GlassMainPage(PostList: PostingList, scrollController: scrollController, index: currentPageIndex,),
+          ]
+      ),
+      floatingActionButton: Stack (
+        children: <Widget> [
+          Align(
+            alignment: Alignment(Alignment.bottomRight.x, Alignment.bottomRight.y-0.2),
+            child: FloatingActionButton(
+              heroTag: 'edit',
+              onPressed: () async {
+                  // + 버튼 클릭시 게시글 생성 페이지로 이동
+                  PostingList = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => CreatePostThread()),
+                );
+                setState(() {});
+              },
+              child: Icon(Icons.edit),
+              elevation: 10,
+            ), 
           ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.edit),
-        onPressed: () async {
-          // + 버튼 클릭시 버킷 생성 페이지로 이동
-           PostingList = await Navigator.push(
-           context,
-           MaterialPageRoute(builder: (_) => CreatePostThread()),
-         );
-         setState(() {});
-        },
-        elevation: 0,
-      ), 
+          Align (
+            alignment: Alignment.bottomRight,
+            child : FloatingActionButton(
+              child: Icon(Icons.arrow_upward),
+              heroTag: 'top',
+              onPressed: () { ScrollToTop(); },
+              elevation: 10,
+            ), 
+          ), 
+        ]
+      ),
       bottomNavigationBar: NavigationBar(
       onDestinationSelected: (int index){  
           setState(() {
@@ -169,20 +135,121 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
+class GlassMainPage extends StatefulWidget { 
+
+  GlassMainPage({Key? key, required this.index,required this.PostList, required this.scrollController}) : super(key: key);
+
+  final List<Posting_Property?> PostList;
+  late ScrollController scrollController;
+  int index;
+
+  @override
+  State<GlassMainPage> createState() => _GlassMainPageState();
+}
+
+class _GlassMainPageState extends State<GlassMainPage> {
+  final String Content = "";
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scrollbar(
+      child: Align(
+        child : Container(
+          color: Color.fromARGB(255, 214, 214, 225),
+          alignment: Alignment.topLeft, 
+          child: SingleChildScrollView(
+            primary: true,
+            child: Container(
+              margin: EdgeInsets.only(top: 5),
+            // color: Color.fromARGB(255, 31, 31, 30),
+              child : Column (
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(5),
+                    //color: Color.fromARGB(255, 16, 237, 16),
+                    child: ListView.separated (//ListView.builder(\
+                      controller: widget.scrollController,
+                      itemCount: widget.PostList.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index){
+                        return Container (
+                          padding: EdgeInsets.all(10),
+                          color: Color.fromARGB(255, 219, 156, 175),
+                          child : GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute( builder: (context) => ContentPage(Index: index, PostingList: widget.PostList, )));
+                              },
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  height: 150,
+                                  width: 90,
+                                  child: Image(image: FileImage(File(widget.PostList[index]!.UploadImages[0]!.path))),
+                                ),
+                                Expanded(
+                                  child: Container(
+                                    padding: EdgeInsets.only(left:15),
+                                    child: Column (
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                            child: Text(
+                                              widget.PostList[index]!.PostingTitle,
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          Container(
+                                            child: Text(
+                                              widget.PostList[index]!.PostingMainText,
+                                              maxLines: 5,
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ))
+                              ],
+                            ),
+                          ),
+                        );
+                      }, separatorBuilder: (BuildContext context, int index) => const Divider(),
+                      
+                    ),
+                  ),
+                ],
+              )
+            ),
+          ),
+        ),
+      ),
+    );
+
+  }
+}
 
 class ContentPage extends StatelessWidget {
-  final String content;
- 
-  const ContentPage({Key? key, required this.content}) : super(key: key);
- 
+  final int Index;
+  final List<Posting_Property?> PostingList;
+  const ContentPage({Key? key, required this.Index, required this.PostingList, }) : super(key: key);
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Content'),
+        title: Text(PostingList[Index]!.PostingTitle),
       ),
       body: Center(
-        child: Text(content),
+        //String sss = PostingList[Index]!.PostingTitle;
+        child: Text(PostingList[Index]!.PostingMainText),
       ),
     );
   }
@@ -190,27 +257,27 @@ class ContentPage extends StatelessWidget {
 /*
 
  return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget> [
-                    Container(
-                      decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      image:
-                        DecorationImage(
-                            fit: BoxFit.cover,  //사진을 크기를 상자 크기에 맞게 조절
-                            image: FileImage(File(PostImage[index]!.path))   // images 리스트 변수 안에 있는 사진들을 순서대로 표시함
-                        )
-                      ),
-                    ),
-                  ],
-                );
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: <Widget> [
+      Container(
+        decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5),
+        image:
+          DecorationImage(
+              fit: BoxFit.cover,  //사진을 크기를 상자 크기에 맞게 조절
+              image: FileImage(File(PostImage[index]!.path))   // images 리스트 변수 안에 있는 사진들을 순서대로 표시함
+          )
+        ),
+      ),
+    ],
+  );
 
      title: Text(
-                    PostingList[index]!.PostingTitle,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  subtitle: Text(
-                    PostingList[index]!.PostingMainText,                    
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  */
+      PostingList[index]!.PostingTitle,
+      overflow: TextOverflow.ellipsis,
+    ),
+    subtitle: Text(
+      PostingList[index]!.PostingMainText,                    
+      overflow: TextOverflow.ellipsis,
+    ),
+    */

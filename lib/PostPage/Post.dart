@@ -32,7 +32,7 @@ class _CreatePostThreadState extends State<CreatePostThread> {
         leading: IconButton(
           icon: Icon(CupertinoIcons.chevron_back),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pop(context, _posting_property);
           },
         ),
       ),
@@ -81,7 +81,7 @@ class _CreatePostThreadState extends State<CreatePostThread> {
                           decoration: const InputDecoration (
                           prefixIcon: Icon(Icons.phone_android ,color: Colors.blueAccent,),
                            border: OutlineInputBorder(),
-                           filled: false,
+                           filled: true,
                            hintText: '연락처',
                            labelText: '연락처',
                           ),
@@ -93,7 +93,7 @@ class _CreatePostThreadState extends State<CreatePostThread> {
                           decoration: const InputDecoration(
                             prefixIcon: Icon(Icons.insert_link ,color: Colors.blueAccent,),
                             border: OutlineInputBorder(),
-                            filled: false,
+                            filled: true,
                             hintText: 'Enter a description...',
                             labelText: '링 크',
                           ),
@@ -185,7 +185,6 @@ class _FormImageUploaderState extends State<_FormImageUploader> {
       //  const SizedBox(height: 1),
         _GridPhoto(),
       ],
-      
 
     );
   }
@@ -210,8 +209,10 @@ class _FormImageUploaderState extends State<_FormImageUploader> {
             icon: Icon(Icons.collections, size: 50, color: Colors.blueAccent)
           ),
           */
-          TextButton(
-            child: const Text('갤러리'),            
+          TextButton.icon(
+            label: const Text('회사 소개 이미지 가져오기'),
+            icon: Icon(Icons.image, size: 50,),
+            style: TextButton.styleFrom(foregroundColor: Colors.blueGrey),
             onPressed : () =>getMultiImage(),            
           ),
           const SizedBox(width: 5),          
