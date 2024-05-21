@@ -4,13 +4,17 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'PostPage/Post.dart';
 import 'PostPage/PostModel.dart';
 
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    // Adding ProviderScope enables Riverpod for the entire project
+    const ProviderScope(child: MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -28,14 +32,15 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MainPage extends StatefulWidget {
+class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  _MainPageState createState() => _MainPageState();
+  //State<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends ConsumerState<MainPage> {
   int currentPageIndex =0;
   late List<Posting_Property?> PostingList = [];
   late ScrollController scrollController = ScrollController();
@@ -62,7 +67,7 @@ class _MainPageState extends State<MainPage> {
   }
   
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext contextf) {
     //final sizex = MediaQuery.of(context).size.width;
     //final sizey = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -73,6 +78,7 @@ class _MainPageState extends State<MainPage> {
           index: currentPageIndex,
           children: [
             GlassMainPage(PostList: PostingList, scrollController: scrollController, index: currentPageIndex,),
+            Businesspage(),
           ]
       ),
       floatingActionButton: Stack (
@@ -153,6 +159,9 @@ class _GlassMainPageState extends State<GlassMainPage> {
   @override
   Widget build(BuildContext context) {
     return Scrollbar(
+   //    appBar: AppBar (
+    //    title: Text("메인 페이지"),
+    //  ),
       child: Align(
         child : Container(
           color: Color.fromARGB(255, 214, 214, 225),
@@ -250,6 +259,27 @@ class ContentPage extends StatelessWidget {
       body: Center(
         //String sss = PostingList[Index]!.PostingTitle;
         child: Text(PostingList[Index]!.PostingMainText),
+      ),
+    );
+  }
+}
+
+class Businesspage extends StatefulWidget {
+  @override
+  State<Businesspage> createState() => _BusinesspageState();
+}
+
+class _BusinesspageState extends State<Businesspage> {
+  //final int Index;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("기타 비지니스 페이지 "),
+      ),
+      body: Center(
+        //String sss = PostingList[Index]!.PostingTitle;
+        child: Text("사용처 없음"),
       ),
     );
   }
