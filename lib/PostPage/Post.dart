@@ -9,6 +9,26 @@ import 'PostModel.dart';
 
 final List<Posting_Property?> _posting_property = [];
 
+
+class ContentPage extends StatelessWidget {
+  final int Index;
+  final List<Posting_Property?> PostingList;
+  const ContentPage({Key? key, required this.Index, required this.PostingList, }) : super(key: key);
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(PostingList[Index]!.PostingTitle),
+      ),
+      body: Center(
+        //String sss = PostingList[Index]!.PostingTitle;
+        child: Text(PostingList[Index]!.PostingMainText),
+      ),
+    );
+  }
+}
+
 class CreatePostThread extends StatefulWidget {
   const CreatePostThread({super.key});
 
@@ -258,19 +278,3 @@ class _FormImageUploaderState extends State<_FormImageUploader> {
     );
   }
 }
-/* child : ListView.builder(
-        itemCount: PickedImages.length,
-        itemBuilder: (context, index) {
-          //final image = PickedImages[index];
-          return Feed(imageFile: [PickedImages[index]],);
-          Column (
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Image.file(
-                File(PickedImages.path),
-                fit: BoxFit.cover,
-              )
-            ],
-
-          );  
-          */
