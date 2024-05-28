@@ -1,12 +1,11 @@
-
-import 'dart:io';
 //import 'dart:js';
 
 import 'package:flutter/material.dart';
+import 'package:glassapp/BusinessPage/BusinessPage.dart';
+import 'package:glassapp/EstiamtePage/EstimatePage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'PostPage/Post.dart';
 import 'PostPage/PostModel.dart';
 
 
@@ -23,6 +22,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'PostingApp', // 앱의 아이콘 이름
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         textTheme: GoogleFonts.getTextTheme('Noto Sans'),
@@ -45,7 +45,6 @@ class _MainPageState extends ConsumerState<MainPage> {
   late List<Posting_Property?> PostingList = [];
   late ScrollController scrollController = ScrollController();
 
-  
    @override
   void initState() {
     scrollController = ScrollController();
@@ -66,9 +65,9 @@ class _MainPageState extends ConsumerState<MainPage> {
         home: Scaffold (
           body :IndexedStack (
             index: currentPageIndex,
-            children: [
-              GlassMainPage(PostList: PostingList, scrollController: scrollController, index: currentPageIndex,),
-              Businesspage(),
+            children: [   
+              GlassMainPage(),
+              Businesspage(PostList: PostingList, scrollController: scrollController, index: currentPageIndex,),
               ProfilePage(),
             ]
           ),
@@ -80,18 +79,19 @@ class _MainPageState extends ConsumerState<MainPage> {
           });
         },
         indicatorColor: Colors.amber,
+        selectedIndex : currentPageIndex,
         backgroundColor: Colors.lightGreen,
-          destinations: const <Widget>[
+          destinations: <Widget>[
           NavigationDestination(
             selectedIcon: Icon(Icons.forum),
             icon: Icon(Icons.forum_outlined),
-            label: '게시글',
+            label: '내 플러터',
           ),
           NavigationDestination(
-            //selectedIcon: Icon(Icons.business_sharp),
-            icon: Badge(child: Icon(Icons.business)),
-           // icon: Icon(Icons.business),
-            label: 'Business1',
+            selectedIcon: Icon(Icons.business_sharp),
+           // icon: Badge(child: Icon(Icons.business)),
+            icon: Icon(Icons.business),
+            label: '게시글',
           ),
           NavigationDestination(
             selectedIcon: Icon(Icons.person_2_sharp),
@@ -108,171 +108,150 @@ class _MainPageState extends ConsumerState<MainPage> {
 
 class GlassMainPage extends StatefulWidget { 
 
-  final List<Posting_Property?> PostList;
-  final ScrollController scrollController;
-
-  final int index;
-
-  GlassMainPage({Key? key, required this.index,required this.PostList, required this.scrollController}) : super(key: key);
+  GlassMainPage({Key? key,}) : super(key: key);
 
   @override
   State<GlassMainPage> createState() => _GlassMainPageState();
 }
 
+// ignore: must_be_immutable
 class _GlassMainPageState extends State<GlassMainPage> {
+
   final String Content = "";
   int currentPageIndex =0, postingListIndex =0;
-  late List<Posting_Property?> PostingList = [];
-
-  void ScrollToTop() {
-    var controller = PrimaryScrollController.of(context);
-    setState(() {
-      controller.animateTo(0,
-        duration: Duration(milliseconds: 500), curve: Curves.ease);
-    });
-  }
-
-  Widget ScollDisplay() {
-    return Scrollbar(
-        child: Align(
-          child : Container(
-            color: Color.fromARGB(255, 214, 214, 225),
-            alignment: Alignment.topLeft, 
-            child: SingleChildScrollView(
-              primary: true,
-              child: Container(
-                margin: EdgeInsets.only(top: 5),
-              // color: Color.fromARGB(255, 31, 31, 30),
-                child : Column (
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.all(5),
-                      //color: Color.fromARGB(255, 16, 237, 16),
-                      child: ListView.separated (//ListView.builder(\
-                        controller: widget.scrollController,
-                        itemCount: widget.PostList.length,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index){
-                          return Container (
-                            padding: EdgeInsets.all(10),
-                            color: Color.fromARGB(255, 219, 156, 175),
-                            child : GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute( builder: (context) => ContentPage(Index: index, PostingList: widget.PostList, ))
-                                );
-                                postingListIndex = index;
-                              },
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    height: 150,
-                                    width: 90,
-                                    child: Image(image: FileImage(File(widget.PostList[index]!.UploadImages[0]!.path))),
-                                  ),
-                                  Expanded(
-                                    child: Container(
-                                      padding: EdgeInsets.only(left:15),
-                                      child: Column (
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                              child: Text(
-                                                widget.PostList[index]!.PostingTitle,
-                                                style: TextStyle(
-                                                  fontSize: 20,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                            Container(
-                                              child: Text(
-                                                widget.PostList[index]!.PostingMainText,
-                                                maxLines: 5,
-                                                style: TextStyle(
-                                                  fontSize: 15,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                    ))
-                                ],
-                              ),
-                            ),
-                          );
-                        }, separatorBuilder: (BuildContext context, int index) => const Divider(),
-                      ),
-                    ),
-                  ],
-                )
+  
+  Widget Self_estimation() {
+    return Center(
+      child: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Card(
+             // margin : EdgeInsets.only(top: 5.0,),
+              shape: RoundedRectangleBorder(  //모서리를 둥글게 하기 위해 사용
+                borderRadius: BorderRadius.circular(60.0),
+              ),
+              margin: EdgeInsets.symmetric(vertical: 9, horizontal: 100),
+              elevation: 10,
+              child: Image.network('https://get.pxhere.com/photo/planner-evaluate-assessment-teamwork-consulting-estimate-discussion-equipment-business-data-partnership-financial-people-project-adviser-analysis-analyze-assess-businesspeople-meeting-calculate-chart-consult-silhouette-black-sitting-furniture-black-and-white-standing-chair-human-behavior-male-communication-table-line-arm-area-conversation-font-angle-monochrome-joint-clip-art-logo-office-chair-graphics-shoe-1447891.jpg'),
+            ),
+            const SizedBox(
+              height: 30,
+            ),
+            Text(
+              //"합리적인 가격에 견적을 받으세요",
+              "플러터 공부 지금 당장 시작하세요",
+              style: TextStyle(
+                fontSize: 25.0,
+                color: Colors.black,
               ),
             ),
-          ),
-        ),
-      );
-  }
-  
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("게시글 페이지"),
-      ),
-      body : ScollDisplay(),
-      floatingActionButton: Stack (
-        children: <Widget> [
-          Align(
-            alignment: Alignment(Alignment.bottomRight.x, Alignment.bottomRight.y-0.2),
-            child: FloatingActionButton(
-              heroTag: 'edit',
-              onPressed: () async {
-                  // + 버튼 클릭시 게시글 생성 페이지로 이동
-                  PostingList = await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => CreatePostThread()),
-                );
-                setState(() {});
-              },
-              child: Icon(Icons.edit),
-              elevation: 10,
-            ), 
-          ),
-          Align (
-            alignment: Alignment.bottomRight,
-            child : FloatingActionButton(
-              child: Icon(Icons.arrow_upward),
-              heroTag: 'top',
-              onPressed: () { ScrollToTop(); },
-              elevation: 10,
-            ), 
-          ), 
-        ]
-      ),
+            Text(
+              //"무엇을 도와 드릴까요?",
+              "플러터 어디까지 해봤니",
+              style: TextStyle(
+                fontSize: 20.0,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height*0.13,
+              child :Card(
+                color: Colors.white,
+                margin: EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+                child: ListTile(
+                  trailing: Icon(Icons.shopping_cart),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute( builder: (context) => EstimatePage())
+                    );
+                  },
+                  title: Text (
+                    textAlign: TextAlign.start,
+                    //"견적 내보기",
+                    "I LIKE FULTTER",
+                    style : TextStyle(
+                      height: 3,
+                      fontSize: 30,
+                    ),
+                  )
+                ),
+              ),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height*0.13,
+             // child : Container ( 
+              child: Card(
+                color: Colors.white,
+                margin: EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+            /*    child : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      child :Text (
+                        textAlign: TextAlign.start,
+                        "I LOVE FLUTTER",
+                        style : TextStyle(
+                          height: 3,
+                          fontSize: 30,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      //width: 20,
+                    ),
+                    Container(
+                      //margin: EdgeInsets.symmetric(vertical: 1, horizontal: 10,),
+                      child: Image.network(fit: BoxFit.cover, 'https://st4.depositphotos.com/12982378/23018/i/1600/depositphotos_230185830-stock-photo-handsome-man-holding-bag-sitting.jpg'),
+                    )
+                  ]
+                )
+                */
+               child: ListTile(
+                  trailing: ClipRRect(
+                    borderRadius : BorderRadius.circular(100),
+                    child: Image.network(fit: BoxFit.fill, 'https://st4.depositphotos.com/12982378/23018/i/1600/depositphotos_230185830-stock-photo-handsome-man-holding-bag-sitting.jpg'),//Icon(Icons.shopping_cart),
+                  ),
+                  onTap: () {
+                /*   Navigator.push(
+                       context,
+                       MaterialPageRoute( builder: (context) => )
+                    );*/
+                  },
+                  title: Text (
+                    textAlign: TextAlign.start,
+                    "I LOVE FLUTTER",
+                    style : TextStyle(
+                      height: 3,
+                      fontSize: 30,
+                    ),
+                  )
+                ),
+              ),
+           ),
+          ],
+        )
+      )
     );
   }
-}
 
-class Businesspage extends StatefulWidget {
-  
-  @override
-  State<Businesspage> createState() => _BusinesspageState();
-}
-
-class _BusinesspageState extends State<Businesspage> {
-  //final int Index;
   @override
   Widget build(BuildContext context) {
-    print("기타페이지");
+    //final sizex = MediaQuery.of(context).size.width;
+    //final sizey = MediaQuery.of(context).size.height;
+  
     return Scaffold(
-      appBar: AppBar(title: Text("기타 비지니스 페이지 "),),
-      body: Center(
-        //String sss = PostingList[Index]!.PostingTitle;
-        child: Text("기타 페이지"),
+      appBar: AppBar(
+        title: Text("플러터 페이지"),
       ),
+      backgroundColor: Color.fromARGB(255, 201, 238, 193),
+      body : Self_estimation(),
     );
   }
 }

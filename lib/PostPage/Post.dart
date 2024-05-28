@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:glassapp/Utills/ImageSelection.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'PostModel.dart';
-
 
 final List<Posting_Property?> _posting_property = [];
 
@@ -13,7 +13,9 @@ final List<Posting_Property?> _posting_property = [];
 class ContentPage extends StatelessWidget {
   final int Index;
   final List<Posting_Property?> PostingList;
-  const ContentPage({Key? key, required this.Index, required this.PostingList, }) : super(key: key);
+  final List<XFile> SelectedImage;
+
+  const ContentPage({Key? key, required this.Index, required this.PostingList, required this.SelectedImage, }) : super(key: key);
   
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,6 @@ class ContentPage extends StatelessWidget {
         title: Text(PostingList[Index]!.PostingTitle),
       ),
       body: Center(
-        //String sss = PostingList[Index]!.PostingTitle;
         child: Text(PostingList[Index]!.PostingMainText),
       ),
     );
@@ -30,24 +31,32 @@ class ContentPage extends StatelessWidget {
 }
 
 class CreatePostThread extends StatefulWidget {
-  const CreatePostThread({super.key});
+//  final List<XFile> SelectedImage;
 
+  const CreatePostThread({super.key, /*required this.SelectedImage*/});
+  
   @override
   State<CreatePostThread> createState() => _CreatePostThreadState();
 }
 
 class _CreatePostThreadState extends State<CreatePostThread> {
+
+  //_CreatePostThreadState({super.key, required this.pickedImages});
   //final _formkey = GlobalKey<FormState>();
-  final List<XFile> _pickedImages = [];
+  late List<XFile?> pickedImages = [];
+  final _formKey = GlobalKey<FormState>();
+
   String title = '';
   String description = '';
   String PhoneNumber = '';
   String Url = '';
+
+  Posting_Property? aaa;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
        appBar: AppBar(
-        title: Text("게시글 작성"),
+        title: Text("견적 내기"),
         // 뒤로가기 버튼
         leading: IconButton(
           icon: Icon(CupertinoIcons.chevron_back),
@@ -57,6 +66,7 @@ class _CreatePostThreadState extends State<CreatePostThread> {
         ),
       ),
       body: Form(
+        key: _formKey,
         child: Scrollbar(
           child: Align(
             alignment: Alignment.topCenter,
@@ -74,12 +84,20 @@ class _CreatePostThreadState extends State<CreatePostThread> {
                           decoration: const InputDecoration(
                             filled: true,
                             hintText: 'Enter a tittle',
-                            labelText: '제 목',
+                            labelText: 'NAME',
                           ),
-                          onChanged: (value) {
-                          //  setState(() {
-                              title = value;
-                           // });
+                          autofocus: true,
+                          textInputAction: TextInputAction.next,
+                          validator: (value) {
+                            if(value!.isEmpty) {
+                              return '반드시 입력 해야 합니다.';
+                            }
+                            return null;
+                          },
+                          onSaved:(value) {
+                            setState(() {
+                              title = value!;
+                            });
                           },
                         ),
                         TextFormField(
@@ -87,16 +105,24 @@ class _CreatePostThreadState extends State<CreatePostThread> {
                             border: OutlineInputBorder(),
                             filled: true,
                             hintText: 'Enter a description...',
-                            labelText: '소 개',
+                            labelText: '소개 및 실적',
                           ),
-                          onChanged: (value) {
-                            description = value;
+                          autofocus: true,
+                          textInputAction: TextInputAction.next,
+                          validator: (value) {
+                            if(value!.isEmpty) {
+                              return '반드시 입력 해야 합니다.';
+                            }
+                            return null;
                           },
-                          maxLines: 10,
+                          onSaved: (value) {
+                            description = value!;
+                          },
+                    //      maxLines: 10,
                         ),
                         TextFormField (
-                          onChanged: (value) {
-                            PhoneNumber = value;
+                          onSaved: (value) {
+                            PhoneNumber = value!;
                           },
                           decoration: const InputDecoration (
                           prefixIcon: Icon(Icons.phone_android ,color: Colors.blueAccent,),
@@ -107,18 +133,19 @@ class _CreatePostThreadState extends State<CreatePostThread> {
                           ),
                         ),
                         TextFormField(
-                          onChanged: (value) {
-                            Url = value;
+                          onSaved: (value) {
+                            Url = value!;
                           },
                           decoration: const InputDecoration(
                             prefixIcon: Icon(Icons.insert_link ,color: Colors.blueAccent,),
                             border: OutlineInputBorder(),
                             filled: true,
-                            hintText: 'Enter a description...',
-                            labelText: '링 크',
+                            hintText: 'www.foo.co.kr',
+                            labelText: '링크',
                           ),
                         ),
-                        _FormImageUploader (PickedImages: _pickedImages,),    
+                       // _FormImageUploader (PickedImages: _pickedImages,), 
+                        FiledImageUploader(PickedImages: pickedImages, aaa: "회사를 소개할 사진이나 실적 사진을 올려주세요."),
                         SizedBox(
                           width: double.infinity,
                           height: 48,
@@ -130,13 +157,27 @@ class _CreatePostThreadState extends State<CreatePostThread> {
                               ),
                             ),
                             onPressed: () {
-                              print("kakakakak " + title + description);
-                              _posting_property.add(Posting_Property(title, description, PhoneNumber, Url, _pickedImages));
-                              print("ITEM COUNT : ");
-                              print(_posting_property.length);
-                              print("\n")
-;                              Navigator.pop(context, _posting_property);
-                            },
+                              if(_formKey.currentState!.validate()) {
+                                _formKey.currentState!.save();
+                                print(title + description);
+                                _posting_property.add(Posting_Property(title, description, PhoneNumber, Url, ));
+                                if(pickedImages.isNotEmpty) {
+                                  //SelectedImage = [];
+                                  SelectedImage.addAll(pickedImages);
+                                  pickedImages = [];
+                                }
+                                else {
+                                  pickedImages.add(null);
+                                  SelectedImage.add(pickedImages[0]);
+                                  pickedImages = [];
+                                  //SelectedImage = List.from(pickedImages);
+                                }
+                                print("ITEM COUNT : ");
+                                print(_posting_property.length);
+                                print("\n")
+  ;                              Navigator.pop(context, _posting_property, );
+                              }
+                            }
                           ),
                         )
                       ].expand(
@@ -159,13 +200,14 @@ class _CreatePostThreadState extends State<CreatePostThread> {
   }
 }
 
+
+/*
 class _FormImageUploader extends StatefulWidget {
  final List<XFile?> PickedImages;
 
   const _FormImageUploader({Key? key, required this.PickedImages}) : super(key: key);
   @override
   State<_FormImageUploader> createState() => _FormImageUploaderState(PickedImages: PickedImages);
-  //State<_FormImageUploader> createState() => _FormImageUploaderState();
 }
 
 class _FormImageUploaderState extends State<_FormImageUploader> {
@@ -230,7 +272,7 @@ class _FormImageUploaderState extends State<_FormImageUploader> {
           ),
           */
           TextButton.icon(
-            label: const Text('회사 소개 이미지 가져오기'),
+            label: const Text('회사를 소개할 사진이나 실적 사진을 올려주세요.'),
             icon: Icon(Icons.image, size: 50,),
             style: TextButton.styleFrom(foregroundColor: Colors.blueGrey),
             onPressed : () =>getMultiImage(),            
@@ -278,3 +320,4 @@ class _FormImageUploaderState extends State<_FormImageUploader> {
     );
   }
 }
+*/
