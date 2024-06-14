@@ -7,32 +7,42 @@ import 'package:image_picker/image_picker.dart';
 
 import '../PostPage/PostModel.dart';
 
-final counterStateProvider = StateProvider<int>((ref) {
-  return 0;
-});
-/*
-final PostStateProvider = StateNotifierProvider<PostingListModel, Posting_Property?>((ref) {
-  //return PostingListModel();
-});
-*/
-class Businesspage extends StatefulWidget {
-  final List<Posting_Property?> PostList;
-  final ScrollController scrollController;
+String title = '';
+String description = '';
+String PhoneNumber = '';
+String Url = '';
+List<Posting_Property?> PosttingList = [];
+List<XFile?> SelectedImage = [];
+PostingImage aaa = PostingImage(title, description, PhoneNumber, Url, SelectedImage, PosttingList);
 
-  final int index;
 
-  Businesspage({Key? key, required this.index,required this.PostList, required this.scrollController}) : super(key: key);
+class Businesspage extends StatefulWidget/*ConsumerStatefulWidget*/ {
+
+  Businesspage({Key? key, }) : super(key: key);
 
   @override
   State<Businesspage> createState() => _BusinesspageState();
+  //_BusinesspageState createState() => _BusinesspageState();
 }
 
-class _BusinesspageState extends State<Businesspage> {
+class _BusinesspageState extends State<Businesspage>/*ConsumerState<Businesspage>*/ {
   final GlobalKey<_CustomWidgetState> _customWidgetKey = GlobalKey<_CustomWidgetState>();
 
   int currentPageIndex =0, postingListIndex =0;
-  late List<Posting_Property?> PostingList = List.from(widget.PostList);
-  List<XFile> UploadImages = [];
+  
+  ScrollController scrollController = ScrollController();
+  
+  List<XFile?> UploadImages = [];
+
+ @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   void ScrollToTop() {
     var controller = PrimaryScrollController.of(context);
@@ -60,18 +70,18 @@ class _BusinesspageState extends State<Businesspage> {
                       margin: EdgeInsets.all(5),
                       //color: Color.fromARGB(255, 16, 237, 16),
                       child: ListView.separated (//ListView.builder(\
-                        controller: widget.scrollController,
-                        itemCount: PostingList.length,
+                        controller: scrollController,
+                        itemCount: aaa.PosttingList.length,
                         shrinkWrap: true,
                         itemBuilder: (context, index){
                           return Container (
                             padding: EdgeInsets.all(10),
-                            color: Color.fromARGB(255, 219, 156, 175),
+                            color: Color.fromARGB(255, 227, 240, 230),
                             child : GestureDetector(
                               onTap: () {
                                 Navigator.push(
                                     context,
-                                    MaterialPageRoute( builder: (context) => ContentPage(Index: index, PostingList: PostingList, SelectedImage: UploadImages,))
+                                    MaterialPageRoute( builder: (context) => ContentPage(Index: index, PostingList: aaa.PosttingList, SelectedImage: aaa.PosttingList[index]!.SelectingImage,))
                                 );
                                 postingListIndex = index;
                               },
@@ -80,8 +90,8 @@ class _BusinesspageState extends State<Businesspage> {
                                   SizedBox(
                                     height: 150,
                                     width: 90,
-                                     child: SelectedImage[index ]==null ? Image.asset('assets/image/No_image.png') 
-                                        : Image(image: FileImage(File(SelectedImage[index]!.path))),
+                                     child: aaa.PosttingList[index]?.SelectingImage[0] == null ? Image.asset('assets/image/No_image.png') 
+                                        : Image(image: FileImage(File(aaa.PosttingList[index]!.SelectingImage[0]!.path))),
                                   ),
                                   Expanded(
                                     child: Container(
@@ -91,7 +101,7 @@ class _BusinesspageState extends State<Businesspage> {
                                         children: [
                                           Container(
                                               child: Text(
-                                                PostingList[index]!.PostingTitle,
+                                                aaa.PosttingList[index]!.PostingTitle,
                                                 style: TextStyle(
                                                   fontSize: 20,
                                                 ),
@@ -100,7 +110,7 @@ class _BusinesspageState extends State<Businesspage> {
                                             ),
                                             Container(
                                               child: Text(
-                                                PostingList[index]!.PostingMainText,
+                                                aaa.PosttingList[index]!.PostingMainText,
                                                 maxLines: 5,
                                                 style: TextStyle(
                                                   fontSize: 15,
@@ -129,8 +139,7 @@ class _BusinesspageState extends State<Businesspage> {
   
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+    return Scaffold(
         appBar: AppBar(title: Text("게시글 페이지 "),),
         body: PostingDisplay(),
         floatingActionButton: Stack (
@@ -141,11 +150,15 @@ class _BusinesspageState extends State<Businesspage> {
               heroTag: 'edit',
               onPressed: () async {
                   // + 버튼 클릭시 게시글 생성 페이지로 이동
-                  PostingList = await Navigator.push(
+                  final result = await Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => CreatePostThread()),
                 );
-                setState(() {});
+                setState(() {
+                  if(result != null) {
+                    aaa = result;
+                  };
+                });
               },
               child: Icon(Icons.edit),
               elevation: 10,
@@ -156,14 +169,14 @@ class _BusinesspageState extends State<Businesspage> {
             child : FloatingActionButton(
               child: Icon(Icons.arrow_upward),
               heroTag: 'top',
-              onPressed: () { PostingDisplay(); },
+              onPressed: () { ScrollToTop(); },
               elevation: 10,
             ), 
           ), 
         ]
       ),
-      ),
-    );
+      );
+  //  );
   }
 }
 
@@ -183,8 +196,8 @@ class _CustomWidgetState extends State<CustomWidget> {
     return SizedBox(
       height: 150,
       width: 90,
-      child: SelectedImage.isEmpty? Image.asset('assets/image/No_image.png') 
-      : Image(image: FileImage(File(SelectedImage[0]!.path))),//SelectedImage
+   //   child: SelectedImage.isEmpty? Image.asset('assets/image/No_image.png') 
+   //   : Image(image: FileImage(File(SelectedImage[0]!.path))),//SelectedImage
     );
   }
 }

@@ -1,35 +1,180 @@
-import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:glassapp/PostPage/PostPhotoView.dart';
 import 'package:glassapp/Utills/ImageSelection.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'PostModel.dart';
 
 final List<Posting_Property?> _posting_property = [];
 
 
-class ContentPage extends StatelessWidget {
+class ContentPage extends StatefulWidget {
   final int Index;
   final List<Posting_Property?> PostingList;
-  final List<XFile> SelectedImage;
+  final List<XFile?> SelectedImage;
 
   const ContentPage({Key? key, required this.Index, required this.PostingList, required this.SelectedImage, }) : super(key: key);
+
+  @override
+  State<ContentPage> createState() => _ContentPageState(index: Index, PostingList: PostingList, SelectedImage: SelectedImage);
+}
+
+class _ContentPageState extends State<ContentPage> {
   
+
+  _ContentPageState({required this.index, required this.PostingList, required this.SelectedImage});
+
+  int index = 0;
+  List<Posting_Property?> PostingList = [];
+  List<XFile?> SelectedImage = [];
+  int lendgth_ = 0;
+  bool _hasCallSupport = false;
+  Future<void>? _launched;
+  
+  void initState() {
+    super.initState();
+    String phonenumber = PostingList[index]!.PostingPhoneNumer;
+    phonenumber = '+82' + phonenumber;
+    phonenumber = phonenumber.replaceAll('010', ' 10 ');
+    // Check for phone call support.
+    canLaunchUrl(Uri(scheme: 'tel', path: phonenumber)).then((bool result) {
+      setState(() {
+        _hasCallSupport = result;
+        print("Phone Num : $result $_hasCallSupport");
+      });
+    });
+  } 
+
+  Future<void> _makePhoneCall( {required String? phoneNumber} ) async {
+    if(phoneNumber == '') {
+      phoneNumber = '0';
+    }
+    phoneNumber = '+82' + phoneNumber!;
+    phoneNumber = phoneNumber.replaceAll('010', ' 10 ');
+    
+    final Uri urlParsed = Uri.parse('tel:$phoneNumber');
+    if (await canLaunchUrl(urlParsed)) {
+      await launchUrl(urlParsed);
+    } else {
+      throw 'Could not launch to: $phoneNumber';
+    }
+     
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(PostingList[Index]!.PostingTitle),
+        title: Text(widget.PostingList[widget.Index]!.PostingTitle),
       ),
-      body: Center(
-        child: Text(PostingList[Index]!.PostingMainText),
+      body : Container(
+        child: SingleChildScrollView (
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget> [
+              Text(
+                widget.PostingList[widget.Index]!.PostingMainText,
+                textAlign: TextAlign.left,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20.0,
+                ),
+                // maxLines: 3,
+              ),
+              ElevatedButton (
+               onPressed: _hasCallSupport
+                  ? () => setState(() {
+                      _launched = _makePhoneCall(phoneNumber: PostingList[index]!.PostingPhoneNumer);
+                    })
+                  : null,
+                child: _hasCallSupport
+                    ?  Text(
+                  '연락처 : ' + 
+                  PostingList[index]!.PostingPhoneNumer,
+                  textAlign: TextAlign.left,
+                  style: const TextStyle (
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20.0,
+                  ),
+                )
+                : Text(
+                  '전화 사용 불가' + 
+                  PostingList[index]!.PostingPhoneNumer,
+                  textAlign: TextAlign.left,
+                  style: const TextStyle (
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20.0,
+                  ),
+                )
+              ),
+              widget.PostingList[widget.Index]!.PostingUrl.isEmpty ? 
+                Text("")
+                :
+              ElevatedButton(
+                child : Text(
+                  widget.PostingList[widget.Index]!.PostingUrl,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+                onPressed: () async {
+                    final url = Uri.parse(
+                      "https://" +widget.PostingList[widget.Index]!.PostingUrl
+                    );
+                    if (await canLaunchUrl(url)) {
+                      print("Possible launch $url");
+                      await launchUrl(url,);
+                    } else {
+                      // ignore: avoid_priㅋㅊㅂnt
+                      print("Can't launch $url");
+                    }
+                }, 
+              ),
+              PostingList[index]?.SelectingImage[0] != null ?
+                Column (
+                  children : List.generate(PostingList[index]!.SelectingImage.length, (idx) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.of(context)
+                              .push(MaterialPageRoute(builder: (context) {
+                              return Photoview_viewerPage(Index: idx, SelectedImage: SelectedImage,
+                                );
+                          }));
+                      },
+                      child: Container(
+                        child : Image.asset(PostingList[index]!.SelectingImage.elementAt(idx)!.path), // images 리스트 변수 안에 있는 사진들을 순서대로 표시함
+                      )
+                    ) ;
+                  }).toList(), 
+                )
+                :
+                Column (
+                  children : [ 
+                    Container(
+                      child : Text(
+                        "",
+                        style: TextStyle(
+                          fontSize: 0,
+                        ),
+                      ),
+                    ),
+                  ]
+                ), 
+            ],
+          ),
+        ),
       ),
     );
+        //Text(PostingList[Index]!.PostingMainText),
   }
 }
-
+/*
 class CreatePostThread extends StatefulWidget {
 //  final List<XFile> SelectedImage;
 
@@ -37,40 +182,66 @@ class CreatePostThread extends StatefulWidget {
   
   @override
   State<CreatePostThread> createState() => _CreatePostThreadState();
-}
+}*/
 
-class _CreatePostThreadState extends State<CreatePostThread> {
+//class _CreatePostThreadState extends State<CreatePostThread> {
 
-  //_CreatePostThreadState({super.key, required this.pickedImages});
-  //final _formkey = GlobalKey<FormState>();
+// ignore: must_be_immutable
+class CreatePostThread extends ConsumerWidget {
+
   late List<XFile?> pickedImages = [];
+  //CreatePostThread({required this.bbb}) ;
   final _formKey = GlobalKey<FormState>();
+  //final PostingImage bbb;
 
   String title = '';
   String description = '';
   String PhoneNumber = '';
   String Url = '';
+  List<XFile?> SelectedImage = [];
 
-  Posting_Property? aaa;
+  List<Posting_Property?> PosttingList = [];
+ // late Posting_Property aaa;
+
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+  Widget build(BuildContext context, WidgetRef ref) {
+    Future<bool> ShowTempSaveDialog () async {
+      return await showDialog (
+        barrierDismissible: false,
+        context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Get out?'),
+              content: Text("저장되지 않습니다. 나가시겠습니까?"),
+              actions: <Widget> [
+                TextButton(
+                  child: const Text('Got it'),
+                  onPressed: () {
+                    Navigator.pop(context, true);
+                  }
+                ),
+                TextButton(
+                  child: const Text('Nope'),
+                  onPressed: () => Navigator.pop(context, false),
+                ),
+              ],
+            );
+          },
+      );
+    }
+    return WillPopScope(
+      onWillPop: () async {
+        return await ShowTempSaveDialog(); 
+      },
+      child :Scaffold(
        appBar: AppBar(
         title: Text("견적 내기"),
-        // 뒤로가기 버튼
-        leading: IconButton(
-          icon: Icon(CupertinoIcons.chevron_back),
-          onPressed: () {
-            Navigator.pop(context, _posting_property);
-          },
-        ),
       ),
       body: Form(
         key: _formKey,
         child: Scrollbar(
           child: Align(
             alignment: Alignment.topCenter,
-      //      child : Card(
               child : SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
                 child : ConstrainedBox(
@@ -95,9 +266,7 @@ class _CreatePostThreadState extends State<CreatePostThread> {
                             return null;
                           },
                           onSaved:(value) {
-                            setState(() {
-                              title = value!;
-                            });
+                            title = value!;
                           },
                         ),
                         TextFormField(
@@ -107,6 +276,8 @@ class _CreatePostThreadState extends State<CreatePostThread> {
                             hintText: 'Enter a description...',
                             labelText: '소개 및 실적',
                           ),
+                          keyboardType: TextInputType.multiline,
+                          maxLines: null,
                           autofocus: true,
                           textInputAction: TextInputAction.next,
                           validator: (value) {
@@ -133,6 +304,12 @@ class _CreatePostThreadState extends State<CreatePostThread> {
                           ),
                         ),
                         TextFormField(
+                          validator: (value) {
+                            if(value!.isEmpty) {
+                              value = null;
+                            }
+                            return null;
+                          },
                           onSaved: (value) {
                             Url = value!;
                           },
@@ -144,7 +321,6 @@ class _CreatePostThreadState extends State<CreatePostThread> {
                             labelText: '링크',
                           ),
                         ),
-                       // _FormImageUploader (PickedImages: _pickedImages,), 
                         FiledImageUploader(PickedImages: pickedImages, aaa: "회사를 소개할 사진이나 실적 사진을 올려주세요."),
                         SizedBox(
                           width: double.infinity,
@@ -160,7 +336,6 @@ class _CreatePostThreadState extends State<CreatePostThread> {
                               if(_formKey.currentState!.validate()) {
                                 _formKey.currentState!.save();
                                 print(title + description);
-                                _posting_property.add(Posting_Property(title, description, PhoneNumber, Url, ));
                                 if(pickedImages.isNotEmpty) {
                                   //SelectedImage = [];
                                   SelectedImage.addAll(pickedImages);
@@ -172,10 +347,14 @@ class _CreatePostThreadState extends State<CreatePostThread> {
                                   pickedImages = [];
                                   //SelectedImage = List.from(pickedImages);
                                 }
+                                PostingImage aaa = PostingImage(title, description, PhoneNumber, Url,SelectedImage, _posting_property);
+                                aaa.PostUpdate();
+                                //_posting_property.add(Posting_Property(title, description, PhoneNumber, Url, pickedImages));
+                                
                                 print("ITEM COUNT : ");
                                 print(_posting_property.length);
-                                print("\n")
-  ;                              Navigator.pop(context, _posting_property, );
+                                print("\n");
+                                Navigator.pop(context, aaa);
                               }
                             }
                           ),
@@ -192,132 +371,10 @@ class _CreatePostThreadState extends State<CreatePostThread> {
                   ),
                 ),
               ),
-       //     ),
           ),
         ),
       ),
+    ),
     );
   }
 }
-
-
-/*
-class _FormImageUploader extends StatefulWidget {
- final List<XFile?> PickedImages;
-
-  const _FormImageUploader({Key? key, required this.PickedImages}) : super(key: key);
-  @override
-  State<_FormImageUploader> createState() => _FormImageUploaderState(PickedImages: PickedImages);
-}
-
-class _FormImageUploaderState extends State<_FormImageUploader> {
-
-  _FormImageUploaderState({required this.PickedImages});
-  final List<XFile?> PickedImages;
-  final ImagePicker _picker = ImagePicker();  
-  // 카메라, 갤러리에서 이미지 1개 불러오기
-  // ImageSource.galley , ImageSource.camera 
-  void getImage(ImageSource source) async {
-    final XFile? image = await _picker.pickImage(source: source);
-    if (image != null) {
-      print('이미지가 선택되었습니다.');
-    } else {
-      print('아무것도 선택하지 않았습니다.');
-    }
-    setState(() {
-      PickedImages.add(image!);
-    });
-  }
-  
-  // 이미지 여러개 불러오기
-  void getMultiImage() async {
-    final List<XFile>? images = await _picker.pickMultiImage();
-
-    if (images != null) {
-      setState(() {
-        PickedImages.addAll(images);
-      });
-    }
-  }
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [        
-        _imageLoadButtons(),
-      //  const SizedBox(height: 1),
-        _GridPhoto(),
-      ],
-
-    );
-  }
-
-
-  // 화면 상단 버튼
-  Widget _imageLoadButtons() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 1),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-      /*    SizedBox(
-            child: ElevatedButton(
-              onPressed: () => getImage(ImageSource.camera),
-              child: const Text('Camera'),
-            ),
-          ),*/
-        /*  const SizedBox(width: 10,),
-          IconButton(
-            onPressed: () => getMultiImage(),
-            icon: Icon(Icons.collections, size: 50, color: Colors.blueAccent)
-          ),
-          */
-          TextButton.icon(
-            label: const Text('회사를 소개할 사진이나 실적 사진을 올려주세요.'),
-            icon: Icon(Icons.image, size: 50,),
-            style: TextButton.styleFrom(foregroundColor: Colors.blueGrey),
-            onPressed : () =>getMultiImage(),            
-          ),
-          const SizedBox(width: 5),          
-        ],
-      ),
-    );
-  }
-  
-  // 불러온 이미지 gridView
-  Widget _GridPhoto() { 
-    return Container(
-      margin: EdgeInsets.all(10),
-      child: GridView.builder(padding: EdgeInsets.all(0),
-        shrinkWrap: true,
-        itemCount: PickedImages.length, //보여줄 item 개수. images 리스트 변수에 담겨있는 사진 수 만큼.
-        gridDelegate:
-        SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3, //1 개의 행에 보여줄 사진 개수
-          childAspectRatio:
-          1 / 1, //사진 의 가로 세로의 비율
-          mainAxisSpacing: 10, //수평 Padding
-          crossAxisSpacing: 5, //수직 Padding
-        ),
-        itemBuilder: (BuildContext context, int index) {
-          return Stack(
-            alignment: Alignment.topRight,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    image:
-                    DecorationImage(
-                        fit: BoxFit.cover,  //사진을 크기를 상자 크기에 맞게 조절
-                        image: FileImage(File(PickedImages[index]!.path   // images 리스트 변수 안에 있는 사진들을 순서대로 표시함
-                        ))
-                    )
-                ),
-              ),
-            ],
-          );
-        }
-      ),
-    );
-  }
-}
-*/

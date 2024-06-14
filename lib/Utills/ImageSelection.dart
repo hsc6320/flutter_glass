@@ -93,7 +93,9 @@ class _FiledImageUploaderState extends State<FiledImageUploader> {
           TextButton.icon(
             label: Text(/*'회사를 소개할 사진이나 실적 사진을 올려주세요.*/ImageDescription),
             icon: Icon(Icons.image, size: 50,),
-            style: TextButton.styleFrom(foregroundColor: Colors.blueGrey),
+            style: TextButton.styleFrom(foregroundColor: Colors.blueGrey, 
+                                textStyle: const TextStyle(fontSize: 15),
+                                padding: EdgeInsets.all(3)),
             onPressed : () =>getMultiImage(),            
           ),
           const SizedBox(width: 5),          
