@@ -41,6 +41,8 @@ dependencies:
   url_launcher: ^6.1.10
   photo_view: ^0.15.0
   flutter_native_splash: ^2.4.0
+  flutter_form_builder: ^9.2.1
+  form_builder_validators: ^9.1.0
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +70,10 @@ flutter:
   assets:
     - assets/image/No_image.png
     - assets/image/logo.png
+    - assets/image/football.png
+    - assets/image/running.png
+    - assets/image/soccer.png
+    - assets/image/tennis.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
