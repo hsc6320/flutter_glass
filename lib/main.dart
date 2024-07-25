@@ -2,10 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:glassapp/BusinessPage/BusinessPage.dart';
+import 'package:glassapp/EstiamtePage/CanvasController.dart';
 import 'package:glassapp/EstiamtePage/EstimatePage.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+//import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:provider/provider.dart';
 
 import 'PostPage/PostModel.dart';
 
@@ -15,9 +17,10 @@ void main() {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   
   runApp(
-    // Adding ProviderScope enables Riverpod for the entire project
-    const ProviderScope(child: MyApp()),
-  );
+    ChangeNotifierProvider(
+      create: (_) => CanvasController(),
+      child: const MyApp(),
+   ));
 }
 
 class MyApp extends StatelessWidget {
@@ -75,10 +78,10 @@ class _MainPageState extends State<MainPage> {
         home: Scaffold (
           body : 
           /* currentPageIndex == 0
-                    ? GlassMainPage()
-                    : currentPageIndex == 1
-                        ? Businesspage(PostList: PostingList, /*scrollController: scrollController,*/ index: currentPageIndex,)
-                        : ProfilePage(),
+              ? GlassMainPage()
+              : currentPageIndex == 1
+                  ? Businesspage(PostList: PostingList, /*scrollController: scrollController,*/ index: currentPageIndex,)
+                  : ProfilePage(),
           */
           
        /*   IndexedStack (
@@ -89,8 +92,11 @@ class _MainPageState extends State<MainPage> {
               ProfilePage(),
             ]
           ),*/
-          SafeArea(
-             child: _widgetOptions.elementAt(currentPageIndex),
+          ChangeNotifierProvider(
+            create: (BuildContext context) => CanvasController(),
+            child : SafeArea(
+              child: _widgetOptions.elementAt(currentPageIndex),
+            ),
           ),
 
         bottomNavigationBar: NavigationBar(

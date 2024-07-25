@@ -6,6 +6,8 @@ import 'package:glassapp/EstiamtePage/CustomPainter_2D.dart';
 import 'package:image_picker/image_picker.dart';
 
 
+ShapeChoiceArea shapeArea = ShapeChoiceArea(AreaX: '', AreaY: '', sports: '', );
+ShapeChoiceArea shapeAddArea = ShapeChoiceArea(AreaX: '', AreaY: '', sports: '', );
 class EstimatePage extends StatefulWidget {
   
   EstimatePage({Key? key, /*required this.PickedImages,*/}) : super(key: key);
@@ -19,6 +21,7 @@ class _EstimatePageState extends State<EstimatePage> {
   final _formKey = GlobalKey<FormBuilderState>();
   
   //final List<UniqueKey> _uniqueKey = [ UniqueKey(), UniqueKey(), UniqueKey() ];
+
   final List<widgetControl> _widgetControl = [
       widgetControl (
         uniqueKey: UniqueKey(),
@@ -41,6 +44,7 @@ class _EstimatePageState extends State<EstimatePage> {
   String PhoneNumer = " ";
   String Address = "";
   String Target = "";
+  String beforeTarget = "";
   List<String> Setup = [];
   String Date = " ";
   String SetupCount = "";
@@ -48,6 +52,7 @@ class _EstimatePageState extends State<EstimatePage> {
   String Area_X = "";
   String Area_Y = "";
   String TextInputText = '';
+  String categoryTarget = '';
   List<XFile?> PickedImages = [];
 
   List<XFile?> CustomerImage = [];
@@ -59,21 +64,26 @@ class _EstimatePageState extends State<EstimatePage> {
     SportChoiceArea(height: '42', width: '25', sports: '풋살장'),
     SportChoiceArea(height: '20', width: '50', sports: '육상장'),
     SportChoiceArea(height: '36', width: '18', sports: '테니스장'),
-    SportChoiceArea(height: '', width: '', sports: '기타 및 다목적 구장'),
+    SportChoiceArea(height: '', width: '', sports: '기타 다목적 구장'),
   ];
 
   late SportChoiceArea selectedForwardCurve, selectedReverseCurve;
 
   final List<Widget> fields = [];
   final List<Widget> fields2 = [];
+  final List<Widget> fields3 = [];
   
-  int _newTextFieldId = 0, _newImageFieldId =0;
-  ShapeChoiceArea shapeArea = ShapeChoiceArea(AreaX: '', AreaY: '', sports: '', );
 
+  int _newTextFieldId = 0, _newImageFieldId =0;
+  int _newTextFieldId2 = 0;
   //bool _tartgetHasError = false;
+  String category = '';
   var FirsttargetOptions = ['스포츠', '조경'];
-  var SecondtargetOptions = ['카페', '펜션', '애견카페', '주택'];
-  var ThirdtargetOptions = ['축구장', '풋살장', '육상장', '테니스장', '기타 및 다목적 구장'];
+  var SecondtargetOptions = [CategoryLandscapeGroup().cafe, CategoryLandscapeGroup().pansion, CategoryLandscapeGroup().petPansion, CategoryLandscapeGroup().home];
+  var ThirdtargetOptions = [CategorySportsGroup().soccerField, CategorySportsGroup().footballField, CategorySportsGroup().runningField, 
+                            CategorySportsGroup().tennisField, CategorySportsGroup().etcField];
+
+
 
    @override
   void initState() {
@@ -88,8 +98,10 @@ class _EstimatePageState extends State<EstimatePage> {
 
   String CalculAreaX(String? a, String target) {
     String b = '';
-    print("Calcul  Value : $a, Target : $target");
+    print("CalculAreaX () a : $a, SetupCount : $SetupCount , target : $target");
+
     if(a == null) {
+      print('return b');
       return b;
     }
     if(target == '축구장') {
@@ -110,10 +122,10 @@ class _EstimatePageState extends State<EstimatePage> {
 
   String CalculAreaY(String? a, String target) {
     String b = '';
-    print("Calcul  Value : $a, Target : $target");
     if(a == null) {
       return b;
     }
+    print("CalculAreaY() a : $a, SetupCount : $SetupCount , target : $target");
     if(target == '축구장') {
       b = (int.parse(sports[0].height)*(int.parse(SetupCount))).toString();
     }
@@ -128,16 +140,9 @@ class _EstimatePageState extends State<EstimatePage> {
     }
     return b;
   }
-  Widget RowColumnArea(String a, String b) {
-
-    print("11설치 개수 : $a 또는 $SetupCount");
-    a.length > 0 ? SetupCount=a : SetupCount = '0';
-    print("설치 개수 : $a 또는 $SetupCount의 크기 : ${SetupCount.length}");
-    print("Target : $Target,  $b");
-    b == '기타 및 다목적 구장' ? print(" 가로 : ${shapeArea.AreaX}" ) : null;
-    SetupCount.length > 0 ? b = (int.parse(sports[0].width)*(int.parse(SetupCount))).toString()
-    /*print("ddddfe33   " + (int.parse(sports[0].width)*(int.parse(SetupCount))).toString()) */: null;
-
+  Widget RowColumnArea(String setupCnt, String b) {
+    setupCnt.length > 0 ? SetupCount=setupCnt : SetupCount = '0';
+    //print("RowColumnArea ($SetupCount),($Target)");
     return Row(
       children : <Widget> [
         Container (
@@ -145,24 +150,28 @@ class _EstimatePageState extends State<EstimatePage> {
           width:  MediaQuery.of(context).size.width*0.4,
           height: MediaQuery.of(context).size.height*0.075,
           child : FormBuilderTextField (
-                name: 'widtharea',
-                textInputAction: TextInputAction.next,
-                style : TextStyle(fontSize : 20,),
-                controller: TaggetCountController = TextEditingController(
-                  text: Target == '축구장' ? CalculAreaX(SetupCount,Target) : //(int.parse(sports[0].width)*(int.parse(SetupCount))).toString() : ////sports[0].width : 
-                  (Target == '풋살장') ?  CalculAreaX(SetupCount,Target)://sports[1].width :
-                  (Target == '육상장') ?  CalculAreaX(SetupCount,Target) : //sports[2].width :
-                  (Target == '테니스장') ?  CalculAreaX(SetupCount,Target) :
-                  (Target == '기타 및 다목적 구장') ? shapeArea.AreaX : null
-                ),
-                decoration: InputDecoration(
-                  //hintText: '100',
-                  labelText: '가로 길이(단위 : M)',
-                ),
-                onSaved:(value) {
-                  Area_X = value!;
-                },
+              name: 'widtharea',
+              textInputAction: TextInputAction.next,
+              style : TextStyle(fontSize : 20,),
+              controller: TaggetCountController = TextEditingController(
+                text: Target == '축구장' ? CalculAreaX(SetupCount,Target) : //(int.parse(sports[0].width)*(int.parse(SetupCount))).toString() : ////sports[0].width : 
+                (Target == '풋살장') ?  CalculAreaX(SetupCount,Target)://sports[1].width :
+                (Target == '육상장') ?  CalculAreaX(SetupCount,Target) : //sports[2].width :
+                (Target == '테니스장') ?  CalculAreaX(SetupCount,Target) :
+                (Target == '기타 다목적 구장') ? shapeArea.AreaX :
+                (Target == '카페') ? shapeArea.AreaX :
+                (Target == '펜션') ? shapeArea.AreaX :
+                (Target == '애견카페') ? shapeArea.AreaX :
+                (Target == '주택') ? shapeArea.AreaX : null
               ),
+              decoration: InputDecoration(
+                //hintText: '100',
+                labelText: '가로 길이(단위 : M)',
+              ),
+              onSaved:(value) {
+                Area_X = value!;
+              },
+            ),
           
         ),
         Spacer(
@@ -180,7 +189,11 @@ class _EstimatePageState extends State<EstimatePage> {
                   (Target == '풋살장') ? CalculAreaY(SetupCount,Target) :
                   (Target == '육상장') ? CalculAreaY(SetupCount,Target) : //sports[2].height :
                   (Target == '테니스장') ? CalculAreaY(SetupCount,Target) :
-                  (Target == '기타 및 다목적 구장') ? shapeArea.AreaY : null
+                  (Target == '기타 다목적 구장') ? shapeArea.AreaY : 
+                  (Target == '카페') ? shapeArea.AreaY :
+                  (Target == '펜션') ? shapeArea.AreaY :
+                  (Target == '애견카페') ? shapeArea.AreaY :
+                  (Target == '주택') ? shapeArea.AreaY : null
               ),
             decoration: InputDecoration(
               //hintText: '100',
@@ -192,6 +205,153 @@ class _EstimatePageState extends State<EstimatePage> {
           ),
         ),
       ],
+    );
+  }
+  Widget landscapeCategory() {
+    //print("landscapeCategory($Target), ($categoryTarget)");
+    beforeTarget = Target;
+    return Container (
+      child :SizedBox (
+        width: double.infinity,
+        height: 70,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+              backgroundColor: Color.fromARGB(255, 139, 231, 181),  
+              surfaceTintColor: Color.fromARGB(255, 3, 199, 90),  
+              foregroundColor: Colors.black,
+          ),
+          child: Text(
+            "면적 선택",
+            style: TextStyle(
+              color: Color.fromARGB(255, 255, 255, 255),
+              fontSize: 20,
+            ),
+          ),
+          onPressed: () async {
+            var result;
+            result = await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => OptionChoicepage()),
+            );
+            setState(() {
+              if(result != null) {
+                shapeArea = result;
+              };
+          
+              final newImagedName = 'name2_${_newImageFieldId++}';
+              final newImageKey = ValueKey(_newImageFieldId);
+              final newImageKey2 = ValueKey(_newImageFieldId);
+            
+              fields3.removeWhere((e) => e.key == newImageKey2);
+              _newImageFieldId =0;
+          
+              fields3.add( NewImageField(
+                selectedOption: shapeArea.sports.toString(),
+                key: newImageKey2,
+                name: newImagedName,
+                Target: Target,
+                onDelete : () {
+                  setState(() {
+                    fields3.removeWhere((e) => e.key == newImageKey2);
+                    _newImageFieldId =0;
+                  });
+                }, 
+              ));
+            });
+
+          },
+        ),
+      ),
+    );
+  }
+  Widget sportsCategory () {
+    print("sportsCategory($Target), ($categoryTarget)");
+    beforeTarget = Target;
+    return Container (
+        child : Column (
+          children : [
+           Visibility (
+            visible: Target != '기타 다목적 구장',
+            child : FormBuilderTextField(
+              name: 'setupcount',
+              textInputAction: TextInputAction.go,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: '구장 개수',
+              ),
+            //   controller: TaggetCountController = TextEditingController (
+            //     text: SetupCount = '1',
+            //   ),
+              onSaved:(val) {
+                print("구장 개수 : $SetupCount");
+                SetupCount = val!;
+              },
+              onChanged: (val) {
+                setState(() {
+                  SetupCount = val!;
+                  print("onChanged : $SetupCount");
+                });
+              },
+            ),
+          ),
+    // ...fields2,
+          
+           Visibility(
+            visible: Target == '기타 다목적 구장',
+            child: SizedBox (
+              width: double.infinity,
+              height: 70,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 139, 231, 181),  
+                    surfaceTintColor: Color.fromARGB(255, 3, 199, 90),  
+                    foregroundColor: Colors.black,
+                ),
+                child: Text(
+                  "면적 선택",
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 255, 255, 255),
+                    fontSize: 20,
+                  ),
+                ),
+                onPressed: () async {
+                  var result;
+                  result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => OptionChoicepage()),
+                  );
+                  setState(() {
+                    if(result != null) {
+                      shapeArea = result;
+                    };
+                
+                    final newImagedName = 'name2_${_newImageFieldId++}';
+                    final newImageKey = ValueKey(_newImageFieldId);
+                    final newImageKey2 = ValueKey(_newImageFieldId);
+                  
+                    fields2.removeWhere((e) => e.key == newImageKey2);
+                    _newImageFieldId =0;
+                
+                    fields2.add( NewImageField(
+                      selectedOption: shapeArea.sports.toString(),
+                      key: newImageKey,
+                      name: newImagedName,
+                      Target: Target,
+                      onDelete : () {
+                        setState(() {
+                          fields2.removeWhere((e) => e.key == newImageKey);
+                          _newImageFieldId =0;
+                        });
+                      }, 
+                    ));
+                  });
+
+                },
+              ),
+            ),
+          ),
+          ],  
+    )
     );
   }
   @override
@@ -277,55 +437,89 @@ class _EstimatePageState extends State<EstimatePage> {
                         Date = value!;
                       },
                     ),
-                   
+                    FormBuilderDropdown<String> (
+                      name: 'firstchoicetarget', //category
+                      itemHeight: 50,
+                      decoration: InputDecoration(
+                        labelText: '시공 카테고리를 선택하세요',
+                      ),
+                      items: FirsttargetOptions.map((target) => DropdownMenuItem(
+                            alignment: AlignmentDirectional.center,
+                            value: target,
+                            child: Text(target),
+                          )).toList(), 
+                      onChanged: (val) {
+                        setState(() {
+                          print(val);
+                            categoryTarget = val!;
+                            print("categoryTarget : $categoryTarget");
+                            //_tartgetHasError = !(_formKey.currentState?.fields['choicetarget']!.validate() ?? true);
+                        });
+                      },
+                    ),
                     FormBuilderDropdown<String> (
                       onTap: () {
                         final newImageKey2 = ValueKey(_newImageFieldId);
                           setState(() {
                             fields2.removeWhere((e) => e.key == newImageKey2);
                             _newImageFieldId =0;
+
+                            fields3.removeWhere((e) => e.key == newImageKey2);
+                            _newImageFieldId =0;
                           });
                       },
                       name: 'choicetarget',
                       itemHeight: 50,
-                      decoration: InputDecoration(
+                      decoration: InputDecoration (
                         labelText: '종목을 선택하세요',
                         /*suffix: _tartgetHasError
                             ? const Icon(Icons.error)
                             : const Icon(Icons.check),*/
-                          suffix: IconButton(
-                            onPressed: () {
-                              HelpDialogs().openDialog(context);
-                            },
-                            alignment: Alignment.bottomCenter,
-                            icon: Icon(Icons.help_outline),
-                            iconSize: 35,
-                            tooltip: '도움말',
-                            color: const Color.fromARGB(255, 133, 80, 80),),
-                        hintText: 'Select Target',
+                        suffix: IconButton(
+                          onPressed: () {
+                            HelpDialogs().openDialog(context);
+                          },
+                          alignment: Alignment.bottomCenter,
+                          icon: Icon(Icons.help_outline),
+                          iconSize: 35,
+                          tooltip: '도움말',
+                          color: const Color.fromARGB(255, 133, 80, 80),),
+                          hintText: 'Select Target',
                       ),
                       validator: FormBuilderValidators.compose([FormBuilderValidators.required()]),
-                      items: ThirdtargetOptions.map((target) => DropdownMenuItem(
+                      items: categoryTarget == '스포츠' ? ThirdtargetOptions.map((target) => DropdownMenuItem (
                             alignment: AlignmentDirectional.center,
                             value: target,
                             child: Text(target),
-                          )).toList(),
+                          )).toList() 
+                          :
+                          SecondtargetOptions.map((target) => DropdownMenuItem(
+                            alignment: AlignmentDirectional.center,
+                            value: target,
+                            child: Text(target),
+                          )).toList(), 
                       onChanged: (val) {
                         setState(() {
                           print(val);
                             Target = val!;
+                            print("Target : " +Target);
                             //_tartgetHasError = !(_formKey.currentState?.fields['choicetarget']!.validate() ?? true);
                         });
-                     // },
-                      //valueTransformer: (val) => val?.toString(),
-                          
-                          final newImagedName = 'name1_${_newImageFieldId++}';
-                          final newImageKey = ValueKey(_newImageFieldId);
-                          setState(() {
-                             //MessageBoxDialogs(text: '한 종목만 선택할수 있습니다. 삭제후 다시 선택해 주세요').NoticeMsg(context) : null;
-                            _newImageFieldId > 1 ? _newImageFieldId =0 : null;
+                        //valueTransformer: (val) => val?.toString(),
+
+                        final newImagedName = 'name2_${_newImageFieldId++}';
+                        final newImageKey = ValueKey(_newImageFieldId);
+                        final newImageKey2 = ValueKey(_newImageFieldId);
+                        if(categoryTarget == '스포츠') {
+                          print("이전 Target : " +beforeTarget);
+                          if( (beforeTarget == CategoryLandscapeGroup().cafe) || (beforeTarget == CategoryLandscapeGroup().home) || (beforeTarget == CategoryLandscapeGroup().pansion)
+                              || (beforeTarget == CategoryLandscapeGroup().petPansion) ) {
                             
-                            fields2.add( NewImageField(
+                              fields3.removeWhere((e) => e.key == newImageKey2);
+                              _newImageFieldId =0;
+
+                              fields2.add( NewImageField(
+                              selectedOption: shapeArea.sports.toString(),
                               key: newImageKey,
                               name: newImagedName,
                               Target: Target,
@@ -334,135 +528,73 @@ class _EstimatePageState extends State<EstimatePage> {
                                   fields2.removeWhere((e) => e.key == newImageKey);
                                   _newImageFieldId =0;
                                 });
-                              },
+                              }, 
                             ));
-                          });
+                          }
+                          else {
+                              fields2.removeWhere((e) => e.key == newImageKey);
+                              _newImageFieldId =0;
+
+                              fields2.add( NewImageField(
+                              selectedOption: shapeArea.sports.toString(),
+                              key: newImageKey,
+                              name: newImagedName,
+                              Target: Target,
+                              onDelete : () {
+                                setState(() {
+                                  fields2.removeWhere((e) => e.key == newImageKey);
+                                  _newImageFieldId =0;
+                                });
+                              }, 
+                            ));
+                          }
+                        }
+                        else {
+                          if( (beforeTarget == CategorySportsGroup().etcField) || (beforeTarget == CategorySportsGroup().footballField) || (beforeTarget == CategorySportsGroup().runningField)
+                              || (beforeTarget == CategorySportsGroup().soccerField) ||  (beforeTarget == CategorySportsGroup().tennisField) ) {
+                            
+                              fields2.removeWhere((e) => e.key == newImageKey);
+                              _newImageFieldId =0;
+
+                              fields3.add( NewImageField(
+                              selectedOption: shapeArea.sports.toString(),
+                              key: newImageKey2,
+                              name: newImagedName,
+                              Target: Target,
+                              onDelete : () {
+                                setState(() {
+                                  fields3.removeWhere((e) => e.key == newImageKey2);
+                                  _newImageFieldId =0;
+                                });
+                              }, 
+                            ));
+                          }
+                           else {
+                              fields3.removeWhere((e) => e.key == newImageKey2);
+                              _newImageFieldId =0;
+
+                              fields3.add( NewImageField(
+                              selectedOption: shapeArea.sports.toString(),
+                              key: newImageKey2,
+                              name: newImagedName,
+                              Target: Target,
+                              onDelete : () {
+                                setState(() {
+                                  fields3.removeWhere((e) => e.key == newImageKey2);
+                                  _newImageFieldId =0;
+                                });
+                              }, 
+                            ));
+                          }
+                        }
                       },
                     ),
-                    Visibility(
-                      visible: Target != '기타 및 다목적 구장',
-                      child : FormBuilderTextField(
-                        name: 'setupcount',
-                        textInputAction: TextInputAction.go,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: '구장 개수',
-                        ),
-                    //   controller: TaggetCountController = TextEditingController (
-                    //     text: SetupCount = '1',
-                    //   ),
-                        onSaved:(val) {
-                          print("구장 개수 : $SetupCount");
-                          SetupCount = val!;
-                        },
-                        onChanged: (val) {
-                          setState(() {
-                            SetupCount = val!;
-                          });
-                        },
-                      ), 
-                    ),
+                     
+                    categoryTarget == '스포츠' ? sportsCategory() : landscapeCategory(),
                     ...fields2,
-/*                    Row(
-                      children : <Widget> [
-                        Container (
-                          //alignment: Alignment.bottomLeft,
-                          width:  MediaQuery.of(context).size.width*0.4,
-                          height: MediaQuery.of(context).size.height*0.075,
-                          child : FormBuilderTextField (
-                                name: 'widtharea',
-                                textInputAction: TextInputAction.next,
-                                style : TextStyle(fontSize : 20,),
-                                controller: TaggetCountController = TextEditingController(
-                                  text: Target == '축구장' ? sports[0].width : 
-                                  (Target == '풋살장') ? sports[1].width :
-                                  (Target == '육상장') ? sports[2].width :
-                                  (Target == '테니스장') ? (int.parse(sports[3].width)*(int.parse(SetupCount))).toString() : null
-                                ),
-                                decoration: InputDecoration(
-                                  //hintText: '100',
-                                  labelText: '가로 길이(단위 : M)',
-                                ),
-                                onSaved:(value) {
-                                  Area_X = value!;
-                                },
-                              ),
-                         
-                        ),
-                        Spacer(
-                          flex: 1,
-                        ),
-                        Container(
-                          width:  MediaQuery.of(context).size.width*0.4,
-                          height: MediaQuery.of(context).size.height*0.075,
-                          child : FormBuilderTextField(
-                            name: 'heightarea',
-                            textInputAction: TextInputAction.next,
-                            style : TextStyle(fontSize : 20,),
-                            controller: TargetController = TextEditingController(
-                                  text: Target == '축구장' ? sports[0].height :
-                                  (Target == '풋살장') ? sports[1].height :
-                                  (Target == '육상장') ? sports[2].height :
-                                  (Target == '테니스장') ? sports[3].height : null),
-                            decoration: InputDecoration(
-                              //hintText: '100',
-                              labelText: '세로 길이(단위 : M)',
-                            ),
-                            onSaved:(value) {
-                              Area_Y = value!;
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-*/                    
-                    Visibility(
-                      visible: Target == '기타 및 다목적 구장',
-                      child: SizedBox (
-                        width: double.infinity,
-                        height: 70,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Color.fromARGB(255, 139, 231, 181),  
-                              surfaceTintColor: Color.fromARGB(255, 3, 199, 90),  
-                              foregroundColor: Colors.black,
-                          ),
-                          child: Text(
-                            "면적 선택",
-                            style: TextStyle(
-                              color: Color.fromARGB(255, 255, 255, 255),
-                              fontSize: 20,
-                            ),
-                          ),
-                          onPressed: () async {
-                            var result;
-                            result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => OptionChoicepage()),
-                            );
-                            setState(() {
-                            if(result != null) {
-                                shapeArea = result;
-                              };
-                            });
-
-                          },
-                        ),
-                      ),
-                    ),
-
+                    ...fields3,
                     RowColumnArea(SetupCount,Target),
-                 /*                    
-                    TextFormField(
-                      textInputAction: TextInputAction.next,
-                      decoration: const InputDecoration(
-                        hintText: '스포츠/조경 등',
-                        labelText: '목적 및 용도',
-                      ),
-                      onSaved:(value) {
-                        Target = value!;
-                      },
-                    ),*/
+
                     FormBuilderCheckboxGroup<String>(
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       decoration: const InputDecoration(
@@ -525,35 +657,35 @@ class _EstimatePageState extends State<EstimatePage> {
                           ),
                         ),
                         onPressed: () async {
-                          final newTextFieldName = 'name1_${_newTextFieldId}';
-                         
-                          _newTextFieldId >2 ? MessageBoxDialogs(text: '추가 면적은 3곳을 넘어갈수 없습니다.').NoticeMsg(context)
+                          final newTextFieldName = 'name2_${_newTextFieldId2}';
+                          var result;
+                          _newTextFieldId2 >2 ? MessageBoxDialogs(text: '추가 면적은 3곳을 넘어갈수 없습니다.').NoticeMsg(context)
                           :
-                       //   await Navigator.push(
-                       //     context,
-                       //     MaterialPageRoute(builder: (_) => OptionChoicepage()),
-                       //   );
+                          result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => OptionChoicepage()),
+                          );
+                          if(result != null) {
+                            shapeAddArea = result;
+                          }
 
-                          _newTextFieldId >2 ? null : 
+                          _newTextFieldId2 >2 ? null : 
                           setState(() {
-                            print("$newTextFieldName $_newTextFieldId");
+                            print("$newTextFieldName $_newTextFieldId2");
                             
                             fields.add (NewTextField (
-                              key: _widgetControl[_newTextFieldId].uniqueKey,
+                              key: _widgetControl[_newTextFieldId2].uniqueKey,
                               name: newTextFieldName,
                               onDelete : () {
                                 setState(() {
-                                  _newTextFieldId--;
-                                  fields.removeWhere((e) => e.key == _widgetControl[_newTextFieldId].uniqueKey);
+                                  _newTextFieldId2--;
+                                  fields.removeWhere((e) => e.key == _widgetControl[_newTextFieldId2].uniqueKey);
                                   //fields.removeWhere((e) => e.key == e.
-                                                                   
                                 });
                               },
                             ));
-                            _newTextFieldId++;
+                            _newTextFieldId2++;
                           });
-                          
-                           
                         },
                       ), 
                     ),
@@ -627,16 +759,27 @@ class SportChoiceArea {
   const SportChoiceArea({required this.width, required this.height, required this.sports});
 }
 
+class CategorySportsGroup {
+  String soccerField = '축구장';
+  String footballField = '풋살장';
+  String runningField = '육상장';
+  String tennisField = '테니스장';
+  String etcField = '기타 다목적 구장';
+}
+
+class CategoryLandscapeGroup {
+  String cafe = '카페';
+  String pansion ='펜션';
+  String petPansion = '애견카페';
+  String home = '주택';
+}
+
 class widgetControl {
-  
   final UniqueKey uniqueKey;
-  //final List<String> aa ;
   
   widgetControl({
     required this.uniqueKey,
-  //  required this.aa,
   });
-
 }
 
 class MessageBoxDialogs {
@@ -684,6 +827,7 @@ class HelpDialogs {
 class NewImageField extends StatefulWidget {
   const NewImageField({
     super.key,
+    required this.selectedOption,
     required this.name,
     required this.Target,
     this.onDelete,
@@ -692,51 +836,43 @@ class NewImageField extends StatefulWidget {
   final String name;
   final VoidCallback? onDelete;
   final String Target;
+  final String? selectedOption;
 
   @override
   State<NewImageField> createState() => _NewImageFieldState();
 }
 
 class _NewImageFieldState extends State<NewImageField> {
+  Widget MultipleTaget () {
+   // print("MultipleTaget() 기타 다목적 구장 ${shapeArea.sports}");
+    
+    return CustomPaint (
+      foregroundPainter : (shapeArea.sports == 'Options.option1') ? SqurePaint() :
+      (shapeArea.sports == 'Options.option2') ? Rectanglepaint():
+      (shapeArea.sports == 'Options.option3') ? OvalPaint() : 
+      null,
+    ); 
+  }
+
   @override
   Widget build(BuildContext context) {
-    print(widget.name);
+   // print("ddfwew3244 " + widget.name + shapeArea.sports);
     return Padding(
       padding: const EdgeInsets.only(left: 10),
         child : Row (
           children: [
             Container (
-              width: 330,
+              width: MediaQuery.of(context).size.width*0.78,
+              height: (shapeArea.sports == 'Options.option1') ? MediaQuery.of(context).size.height*0.30 : MediaQuery.of(context).size.height*0.20 ,
               child : widget.Target =='풋살장' ? Image.asset('assets/image/football.png') :
               (widget.Target == '축구장') ? Image.asset('assets/image/soccer.png') :
               (widget.Target == '육상장') ? Image.asset('assets/image/running.png') :
               (widget.Target == '테니스장') ? Image.asset('assets/image/tennis.png') : 
-              (widget.Target == '테니스장') ? 
-              SizedBox (
-                width: double.infinity,
-                height: 70,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 139, 231, 181),  
-                      surfaceTintColor: Color.fromARGB(255, 3, 199, 90),  
-                      foregroundColor: Colors.black,
-                  ),
-                  child: Text(
-                    "면적 선택",
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 255, 255, 255),
-                      fontSize: 20,
-                    ),
-                  ),
-                  onPressed: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => OptionChoicepage()),
-                      );
-                    
-                  },
-                ),
-              ) : null,
+              (widget.Target == '기타 다목적 구장') ? MultipleTaget() :
+              (widget.Target == '카페') ? MultipleTaget() :
+              (widget.Target == '펜션') ? MultipleTaget() :
+              (widget.Target == '애견카페') ? MultipleTaget() :
+              (widget.Target == '주택') ? MultipleTaget() : null,
             ),
             IconButton(
               icon: const Icon(Icons.delete_forever),
@@ -759,6 +895,7 @@ class NewTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController TaggetCountController = TextEditingController();
     print(this.key);
     return Padding(
       padding: const EdgeInsets.all(1),
@@ -772,11 +909,14 @@ class NewTextField extends StatelessWidget {
               name: name,
               textInputAction: TextInputAction.next,
               style : TextStyle(fontSize : 20,),
+              controller: TaggetCountController = TextEditingController(
+                text: shapeAddArea.AreaX
+              ),
               decoration: InputDecoration(
                 labelText: '가로 길이(단위 : M)',
               ),
               onSaved:(value) {
-                //Area_X = value!;
+              //  AreaX = value!;
               },
             ),
           ),
@@ -790,11 +930,14 @@ class NewTextField extends StatelessWidget {
               name: name,
               textInputAction: TextInputAction.next,
               style : TextStyle(fontSize : 20,),
+              controller: TaggetCountController = TextEditingController (
+                text: shapeAddArea.AreaY,
+              ),
               decoration: InputDecoration(
                 labelText: '세로 길이(단위 : M)',
               ),
               onSaved:(value) {
-                //Area_Y = value!;
+             //   AreaY = value!;
               },
             ),
           ),

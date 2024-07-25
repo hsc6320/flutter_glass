@@ -7,7 +7,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:glassapp/EstiamtePage/CustomPaint_Test.dart';
+import 'package:glassapp/EstiamtePage/CustomPainterDrawing.dart';
 import 'package:glassapp/EstiamtePage/EstimatePostModel.dart';
 
 
@@ -53,8 +56,8 @@ class _OptionChoicepageState extends State<OptionChoicepage> {
   Widget build(BuildContext context) {
   double MaxWidth = MediaQuery.of(context).size.width;
   double MaxHeight = MediaQuery.of(context).size.height;
-  print('width : $MaxWidth');
-  print('height : $MaxHeight');
+  //print('width : $MaxWidth');
+  //print('height : $MaxHeight');
     return  WillPopScope (
       onWillPop: () async {
       //  isPortrait = false;
@@ -195,26 +198,25 @@ class _OptionChoicepageState extends State<OptionChoicepage> {
                  //   color: Colors.yellow,
                     child : CustomPaint (
                     //  size: Size(300, 200), // 위젯의 크기를 정함. 
-                    foregroundPainter: OvalPaint(), // painter에 그리기를 담당할 클래스를 넣음.
+                      foregroundPainter: OvalPaint(), // painter에 그리기를 담당할 클래스를 넣음.
                     ), 
                   ),
                 ],
               ),
             ),
             Container(
-              margin: EdgeInsets.only(top : 5),
-              //padding: EdgeInsets.all(1),
+              margin: EdgeInsets.only(top : 1),
+              //padding: EdgeInsets.all(10),
               decoration: BoxDecoration (
                 border: Border.symmetric(horizontal: BorderSide(color: Colors.black, width: 1))
               ),
-           //   color: Colors.blue,
               child : Row(
                 children: [
                   Container (
                     margin: EdgeInsets.only(left: 3, top: 0),
                     padding: EdgeInsets.only(top: 20),
                //     color: Colors.red,
-                    width: MediaQuery.of(context).size.width*0.98,
+                    width: MediaQuery.of(context).size.width*0.5,
                     height: MediaQuery.of(context).size.height*0.1, //Constraints.heightConstraints().maxHeight,
                     child : RadioListTile<Options>(
                       title: Text('직접 그리기'),
@@ -227,16 +229,32 @@ class _OptionChoicepageState extends State<OptionChoicepage> {
                       },
                     ),
                   ), 
-                /*  Container (
-                    width: MediaQuery.of(context).size.width*0.55,//Constraints.widthConstraints().maxWidth,
-                    height: MediaQuery.of(context).size.height*0.16, //Constraints.heightConstraints().maxHeight,
-                    margin: EdgeInsets.only(left: 10,),
-                    color: Colors.yellow,
-                    child : CustomPaint (
-                    //  size: Size(300, 200), // 위젯의 크기를 정함. 
-                    foregroundPainter: OvalPaint(), // painter에 그리기를 담당할 클래스를 넣음.
-                    ), 
-                  ),*/
+                  SizedBox (
+                    width: 200,//double.infinity,
+                    height: 70,
+                   // margin: EdgeInsets.only(left: 10,),
+                   // color: Colors.yellow,
+                    child : ElevatedButton (
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(255, 139, 231, 181),  
+                        surfaceTintColor: Color.fromARGB(255, 3, 199, 90),  
+                        foregroundColor: Colors.black,
+                      ),
+                      onPressed: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => Drawing2D(/*SizeX: double.parse(AreaX), SizeY: double.parse(AreaY),)*/)), //Example()),
+                        );
+                      }, 
+                      child: Text(
+                        "CLICK",
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 255, 255, 255),
+                          fontSize: 30,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
 
               ),
@@ -267,7 +285,7 @@ class _OptionChoicepageState extends State<OptionChoicepage> {
                    onChanged: (val) {
                       setState(() {
                         AreaX = val!;
-                        print("onSaved : $val, $AreaX");
+                        //print("onSaved : $val, $AreaX");
                       });
                     },
                   ),
@@ -290,7 +308,7 @@ class _OptionChoicepageState extends State<OptionChoicepage> {
                     onChanged: (val) {
                       setState(() {
                         AreaY = val!;
-                        print("onSaved : $val, $AreaY");
+                        //print("onSaved : $val, $AreaY");
                       });
                     },
                   ),
@@ -400,6 +418,7 @@ class SqurePaint extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+   // print("SqurePaint())))");
     final paint = Paint()
       ..color = Colors.black // 선의 색
       ..strokeWidth = 3  // 선의 굵기
@@ -470,6 +489,7 @@ class Rectanglepaint extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    //print("Rectanglepaint())))");
     final paint = Paint()
       ..color = Colors.black // 선의 색
       ..strokeWidth = 3  // 선의 굵기
@@ -512,7 +532,6 @@ class Rectanglepaint extends CustomPainter {
 }
 
 class OvalPaint extends CustomPainter {
-  
 
   void drawRowText(Canvas canvas, Size size, String text) {
     //double fontSize = getFontSize(size, text);
@@ -595,7 +614,6 @@ class OvalPaint extends CustomPainter {
 
 }
 
-
 class ShapeChoiceArea {
   final String AreaX;
   final String AreaY;
@@ -617,29 +635,30 @@ class _CustomPaint2DState extends State<CustomPaint2D> {
 
   bool _DisplayRotation() {
     SystemChrome.setPreferredOrientations (
-    isPortrait
+     isPortrait
       ? [
           DeviceOrientation.landscapeRight,
         ]
       : [
           DeviceOrientation.portraitUp,
         ],
-  ).then((value) {
-    SystemChrome.setPreferredOrientations(
-      isPortrait
-        ? [
-            DeviceOrientation.landscapeRight,
-            DeviceOrientation.portraitUp,
-            
-          ]
-        : [
-            DeviceOrientation.portraitUp,
-            DeviceOrientation.landscapeRight,
-          ],
-    );
-  });
-  return true;
+    ).then((value) {
+      SystemChrome.setPreferredOrientations(
+        isPortrait
+          ? [
+              DeviceOrientation.landscapeRight,
+              DeviceOrientation.portraitUp,
+              
+            ]
+          : [
+              DeviceOrientation.portraitUp,
+              DeviceOrientation.landscapeRight,
+            ],
+      );
+    });
+    return true;
   }
+  
   Future<bool> DisplayRotation() async {
     return await _DisplayRotation();
   }

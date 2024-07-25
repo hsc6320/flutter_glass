@@ -97,6 +97,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
+  directed_graph:
+    dependency: transitive
+    description:
+      name: directed_graph
+      sha256: "82061c9ce3ac74d9c4c173fb03daac515d503a0f9f77c0010a872f8c344a4f03"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.9"
+  exception_templates:
+    dependency: transitive
+    description:
+      name: exception_templates
+      sha256: e9303fd16ecdb845a14b397cb93476f807dd2b4706f5ee44f708dbc95c256c33
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.4"
   fake_async:
     dependency: transitive
     description:
@@ -213,6 +229,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.0"
+  graphs:
+    dependency: transitive
+    description:
+      name: graphs
+      sha256: aedc5a15e78fc65a6e23bcd927f24c64dd995062bcd1ca6eda65a3cff92a4d19
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.1"
   html:
     dependency: transitive
     description:
@@ -309,6 +333,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.1+1"
+  infinite_canvas:
+    dependency: "direct main"
+    description:
+      name: infinite_canvas
+      sha256: "61fdb96a0992920ddcd50ab9f44d68e18e572146e5749877d50f3638af8f8763"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.9"
   intl:
     dependency: transitive
     description:
@@ -317,6 +349,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.18.1"
+  lazy_memo:
+    dependency: transitive
+    description:
+      name: lazy_memo
+      sha256: ca4be412d65726f79a30ba6e40b7056f1dbefbb35ec42913365b3f3e86d49279
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.9"
   leak_tracker:
     dependency: transitive
     description:
@@ -373,6 +413,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  nested:
+    dependency: transitive
+    description:
+      name: nested
+      sha256: "03bac4c528c64c95c722ec99280375a6f2fc708eec17c7b3f07253b626cd2a20"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   path:
     dependency: transitive
     description:
@@ -461,6 +509,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
+  provider:
+    dependency: "direct main"
+    description:
+      name: provider
+      sha256: c8a055ee5ce3fd98d6fc872478b03823ffdb448699c6ebdbbc71d59b596fd48c
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.1.2"
+  quote_buffer:
+    dependency: transitive
+    description:
+      name: quote_buffer
+      sha256: c4cd07e55ed1b1645a1cc74278a03b2a642c9f6ea3c0528d51827fdd320acf87
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.6"
   riverpod:
     dependency: transitive
     description:
@@ -666,6 +730,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+  zoom_widget:
+    dependency: "direct main"
+    description:
+      name: zoom_widget
+      sha256: "50fbaa460ffc938ca14c0077f8c9e5968c437897242d7f552dacff1bf3270225"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
 sdks:
   dart: ">=3.3.1 <4.0.0"
   flutter: ">=3.19.0"
