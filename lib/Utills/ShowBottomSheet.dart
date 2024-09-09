@@ -5,10 +5,79 @@ import 'package:flutter/material.dart';
 const tinySpacing = 3.0;
 const double widthConstraint = 450;
 const smallSpacing = 10.0;
+/*
+class BottomSheetSection2 extends StatefulWidget {
+  @override
+  State<BottomSheetSection2> createState() => _BottomSheetSection2State();
+}
+
+class _BottomSheetSection2State extends State<BottomSheetSection> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0), 
+    //  BottomSheet(context);
+    );
+  }
+  void BottomSheet (BuildContext context) {
+    print("bottom sheettttt");
+    List<Widget> buttonList = <Widget>[
+      IconButton(onPressed: () {}, icon: const Icon(Icons.share_outlined)),
+      IconButton(onPressed: () {}, icon: const Icon(Icons.add)),
+      IconButton(onPressed: () {}, icon: const Icon(Icons.delete_outline)),
+      IconButton(onPressed: () {}, icon: const Icon(Icons.archive_outlined)),
+      IconButton(onPressed: () {}, icon: const Icon(Icons.settings_outlined)),
+      IconButton(onPressed: () {}, icon: const Icon(Icons.favorite_border)),
+    ];
+    List<Text> labelList = const <Text>[
+      Text('Share'),
+      Text('Add to'),
+      Text('Trash'),
+      Text('Archive'),
+      Text('Settings'),
+      Text('Favorite')
+    ];
+
+    buttonList = List.generate(
+      buttonList.length,
+      (index) => Padding(
+            padding: const EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                buttonList[index],
+                labelList[index],
+              ],
+            ),
+          ));
+      setState(() {
+        showModalBottomSheet<void>(
+        showDragHandle: true,
+        context: context,
+        // TODO: Remove when this is in the framework https://github.com/flutter/flutter/issues/118619
+        constraints: const BoxConstraints(maxWidth: 640),
+        builder: (context) {
+          return SizedBox(
+            height: 150,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              child: ListView(
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                children: buttonList,
+              ),
+            ),
+          );
+        },
+      );
+      });
+  }
+}
+*/
 
 class BottomSheetSection extends StatefulWidget {
   const BottomSheetSection({super.key});
-
+  
   @override
   State<BottomSheetSection> createState() => _BottomSheetSectionState();
 }
@@ -19,6 +88,7 @@ class _BottomSheetSectionState extends State<BottomSheetSection> {
 
   @override
   Widget build(BuildContext context) {
+    print("바탐 시트");
     List<Widget> buttonList = <Widget>[
       IconButton(onPressed: () {}, icon: const Icon(Icons.share_outlined)),
       IconButton(onPressed: () {}, icon: const Icon(Icons.add)),
@@ -55,7 +125,7 @@ class _BottomSheetSectionState extends State<BottomSheetSection> {
       child: Wrap(
         alignment: WrapAlignment.spaceEvenly,
         children: [
-          TextButton(
+       /*   TextButton(
             child: const Text(
               'Show modal bottom sheet',
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -81,7 +151,7 @@ class _BottomSheetSectionState extends State<BottomSheetSection> {
                 },
               );
             },
-          ),
+          ),*/
           TextButton(
             child: Text(
               isNonModalBottomSheetOpen
@@ -183,7 +253,7 @@ class _ComponentDecorationState extends State<ComponentDecoration> {
                   },
                   behavior: HitTestBehavior.opaque,
                   child: Card(
-                    elevation: 0,
+                    elevation: 1,
                     shape: RoundedRectangleBorder(
                       side: BorderSide(
                         color: Theme.of(context).colorScheme.outlineVariant,
@@ -192,7 +262,7 @@ class _ComponentDecorationState extends State<ComponentDecoration> {
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 5.0, vertical: 20.0),
+                          horizontal: 10.0, vertical: 20.0),
                       child: Center(
                         child: widget.child,
                       ),
